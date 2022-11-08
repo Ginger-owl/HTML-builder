@@ -16,7 +16,7 @@ fs.readdir(folderPath,
             if (stats.isFile()) {
               const fileName = file.split('.')[0];
               const fileType = path.extname(file).replaceAll('.','');
-              const fileSize = stats.size / 1000;
+              const fileSize = stats.size / 1024;
               console.log(`${fileName} - ${fileType} - ${fileSize}kb`);
             }
           }
