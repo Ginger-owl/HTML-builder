@@ -15,7 +15,7 @@ stdout.write(greeting);
 
 stdin.on('data', data => {
   const msg = data.toString().trim();
-  if (msg == 'exit()') {
+  if (msg == 'exit') {
     farewellHandler();
   }
   output.write(msg);
