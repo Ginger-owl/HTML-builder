@@ -17,20 +17,16 @@ let copyFolder = async (folderPath, CopyPath) => {
       console.log("Error", err);
     }
   })
-
-  fs.readdir(folderPath, (err, files) => {
-      if (err) {
-        console.log("Error: ", err)
-      } else {
-        files.forEach(file => {
-          fs.copyFile(path.resolve(folderPath, file), path.resolve(CopyPath, file), err => {
-            if (err) {
-              console.log("Error", err);
-            }
-          });
-        })
-      }
-    });
+  
+  fsPromises.readdir(folderPath, { withFileTypes: true})
+  .then(files => files.forEach(file => {
+    if (file.isDirectory()) {
+      copyFolder(path.resolve(folderPath, file.name), path.resolve(CopyPath, file.name))
+    } 
+    if (file.isFile()) {
+      fsPromises.copyFile(path.resolve(folderPath, file.name), path.resolve(CopyPath, file.name))
+    }
+  }))
 }
 
 copyFolder(folderPath, copyFolderPath)
