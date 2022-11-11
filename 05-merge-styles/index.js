@@ -7,35 +7,19 @@ const path = require('path');
 const folderPath = path.resolve(__dirname, 'styles');
 const resultPath = path.resolve(__dirname, 'project-dist');
 
-const output = fs.createWriteStream(path.resolve(resultPath, 'bundle.css'));
 
-fs.readdir(folderPath,
-  (err, files) => {
-  if (err) {
-    console.log("Error: ", err);
-  } else {
-    files.forEach(file => {
-      const fileType = path.extname(file);
-        fs.stat(path.resolve(folderPath, file), (err, stats) => {
-          if (err) {
-            console.log("Error - ", err);
-          } else {
-            /* 3. Проверка является ли объект файлом и имеет ли файл нужное расширение */
-            if (stats.isFile() && fileType === '.css') {
-              /* 4. Чтение файла стилей */
-              fs.readFile(path.resolve(folderPath, file), (err, data) => {
-                if (err) {
-                  console.log("Error - ", err);
-                  /* 5. Чтение стилей  */
-                  /* 6. Запись прочитанных стилей в файл **bundle.css** */
-                } else {
-                  output.write(data + "\n");
-                }
-              })
-            }
-          }
-        });
+const gatherStyles = async () => {
+  const StyleFiles = await fs.promises.readdir(folderPath, {withFileTypes: true})
+  const stylesStream = fs.createWriteStream(path.resolve(resultPath, 'bundle.css'));
+  StyleFiles.forEach(async (style) => {
+    // path.extname(style) === '.css'
+    if(style.name.split('.')[1] === 'css') {
+      fs.createReadStream(path.resolve(folderPath, style.name), 'utf8').addListener('data', data => {
+        stylesStream.write(data + '\n');
       })
     }
-  console.log("Bundled!");
-});
+  })
+}
+
+gatherStyles();
+
